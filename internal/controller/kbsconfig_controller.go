@@ -144,14 +144,26 @@ func (r *KbsConfigReconciler) finalizeKbsConfig(ctx context.Context) error {
 		Name:      KbsDeploymentName,
 	}, deployment)
 	if err != nil {
-		r.log.Error(err, "Failed to get KBS deployment")
-		return err
+		if k8serrors.IsNotFound(err) {
+			r.log.Info("KBS deployment not found, nothing to delete", "Deployment.Namespace",
+				r.namespace, "Deployment.Name", KbsDeploymentName)
+		} else {
+			r.log.Error(err, "Failed to get KBS deployment", "Deployment.Namespace",
+				r.namespace, "Deployment.Name", KbsDeploymentName)
+			return err
+		}
+	} else {
+		err = r.Client.Delete(ctx, deployment)
+		if err != nil && !k8serrors.IsNotFound(err) {
+			r.log.Error(err, "Failed to delete KBS deployment", "Deployment.Namespace",
+				r.namespace, "Deployment.Name", KbsDeploymentName)
+			return err
+		}
+		r.log.Info("KBS deployment deleted", "Deployment.Namespace",
+			r.namespace, "Deployment.Name", KbsDeploymentName)
 	}
-	err = r.Client.Delete(ctx, deployment)
-	if err != nil {
-		r.log.Error(err, "Failed to delete KBS deployment")
-		return err
-	}
+
+	r.log.Info("Finalization of KbsConfig completed successfully")
 	return nil
 }
 
