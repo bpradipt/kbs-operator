@@ -345,6 +345,8 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 	// kbs-config
 	volume, err := r.createKbsConfigMapVolume(ctx, "kbs-config")
 	if err != nil {
+		// Just log the error. We don't want a stack trace here
+		r.log.Info("Failed to get KBS config map", "err", err)
 		return nil
 	}
 	volumeMount := createVolumeMount(volume.Name, filepath.Join(kbsDefaultConfigPath, volume.Name))
@@ -354,6 +356,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 	// auth-secret
 	volume, err = r.createAuthSecretVolume(ctx, "auth-secret")
 	if err != nil {
+		r.log.Info("Failed to get KBS auth secret", "err", err)
 		return nil
 	}
 	volumes = append(volumes, *volume)
@@ -369,6 +372,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 	if httpsConfigPresent {
 		volume, err = r.createHttpsKeyVolume(ctx, "https-key")
 		if err != nil {
+			r.log.Info("Failed to get KBS https key", "err", err)
 			return nil
 		}
 		volumes = append(volumes, *volume)
@@ -377,6 +381,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 
 		volume, err = r.createHttpsCertVolume(ctx, "https-cert")
 		if err != nil {
+			r.log.Info("Failed to get KBS https cert", "err", err)
 			return nil
 		}
 		volumes = append(volumes, *volume)
@@ -387,6 +392,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 	// kbs secret resources
 	kbsSecretVolumes, err := r.createKbsSecretResourcesVolume(ctx)
 	if err != nil {
+		r.log.Info("Failed to get KBS secret resources", "err", err)
 		return nil
 	}
 	volumes = append(volumes, kbsSecretVolumes...)
@@ -398,6 +404,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 	// reference-values
 	volume, err = r.createRvpsRefValuesConfigMapVolume(ctx, "reference-values")
 	if err != nil {
+		r.log.Info("Failed to get RVPS reference values config map", "err", err)
 		return nil
 	}
 	volumes = append(volumes, *volume)
@@ -412,6 +419,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 		// as-config
 		volume, err = r.createAsConfigMapVolume(ctx, "as-config")
 		if err != nil {
+			r.log.Info("Failed to get AS config map", "err", err)
 			return nil
 		}
 		volumes = append(volumes, *volume)
@@ -421,6 +429,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 		// rvps-config
 		volume, err = r.processRvpsConfigMapVolume(ctx, "rvps-config")
 		if err != nil {
+			r.log.Info("Failed to get RVPS config map", "err", err)
 			return nil
 		}
 		volumes = append(volumes, *volume)
