@@ -293,7 +293,7 @@ func (r *KbsConfigReconciler) deployOrUpdateKbsDeployment(ctx context.Context) e
 		return err
 	}
 	// Update the found deployment and write the result back if there are any changes
-	err = r.updateKbsDeployment(ctx, found)
+	err = r.updateKbsDeployment(ctx)
 	if err != nil {
 		// Failed to update the deployment
 		r.log.Error(err, "Failed to update Deployment", "Deployment.Namespace", r.namespace, "Deployment.Name", KbsDeploymentName)
@@ -595,7 +595,10 @@ func (r *KbsConfigReconciler) httpsConfigPresent() (bool, error) {
 }
 
 // updateKbsDeployment updates an existing deployment for the KBS instance
-func (r *KbsConfigReconciler) updateKbsDeployment(ctx context.Context, deployment *appsv1.Deployment) error {
+func (r *KbsConfigReconciler) updateKbsDeployment(ctx context.Context) error {
+
+	// Get the updated deployment spec
+	deployment := r.newKbsDeployment(ctx)
 
 	err := r.Client.Update(ctx, deployment)
 	if err != nil {
