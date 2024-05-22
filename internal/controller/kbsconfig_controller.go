@@ -322,13 +322,7 @@ func (r *KbsConfigReconciler) deployOrUpdateKbsDeployment(ctx context.Context) e
 func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Deployment {
 	// Set replica count
 	replicas := int32(1)
-	// Set rolling update strategy
-	rollingUpdate := &appsv1.RollingUpdateDeployment{
-		MaxUnavailable: &intstr.IntOrString{
-			Type:   intstr.Int,
-			IntVal: 1,
-		},
-	}
+
 	// Set labels
 	labels := map[string]string{
 		"app": "kbs",
@@ -455,8 +449,7 @@ func (r *KbsConfigReconciler) newKbsDeployment(ctx context.Context) *appsv1.Depl
 				MatchLabels: labels,
 			},
 			Strategy: appsv1.DeploymentStrategy{
-				RollingUpdate: rollingUpdate,
-				Type:          appsv1.RollingUpdateDeploymentStrategyType,
+				Type: appsv1.RollingUpdateDeploymentStrategyType,
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
